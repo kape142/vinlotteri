@@ -1,0 +1,137 @@
+body {
+    background-color: #4a0000;
+}
+
+.player-column {
+    width: 30%;
+    height: 97%;
+    position: absolute;
+    background-color: beige;
+    border: 1px solid black;
+    margin: 10px;
+}
+
+.player-column-lane {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+}
+
+.name-tag {
+    height: 9.5%;
+    width: calc(100% - 40px);
+    margin: 10px;
+    border: 1px solid grey;
+    text-align: left;
+    font-size: 2em;
+    background-color: white;
+    padding: 0 10px;
+}
+
+.name-tag:first-child {
+    margin-top: 6px;
+}
+
+.name-tag h6 {
+    text-align: center;
+    margin: 0;
+    font-size: 1.12vw;
+}
+
+.name-tag-ticket-area {
+    margin: auto;
+}
+
+.ticket {
+    width: 3vw;
+    height: 2vw;
+    background-color: black;
+    border-radius: 100px;
+    border: 2px solid grey;
+    color: white;
+    font-size: 1vw;
+    vertical-align: center;
+    padding-top: 1vw;
+    display: inline-block;
+    margin: 5px;
+    text-align: center;
+    box-shadow: 3px 3px rgba(0, 0, 0, 0.7);
+}
+
+
+#right-player-column {
+    top: 0;
+    right: 0;
+}
+
+#right-player-column-right {
+    top: 0;
+    right: 0;
+}
+
+#left-player-column {
+    top: 0;
+    left: 0;
+}
+
+#left-player-column-right {
+    top: 0;
+    right: 0;
+}
+
+#drawing-area-wrapper {
+    display: flex;
+    align-items: center;
+    height: 99vh;
+
+}
+
+#drawing-area {
+    width: calc(40% - 80px);
+    margin-left: calc(30% + 40px);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#drawing-area div {
+}
+
+
+@media screen and (orientation: portrait){
+    .player-column {
+        width: 48%;
+        height: 75%;
+        border: none;
+    }
+
+    #drawing-area-wrapper {
+        position: absolute;
+        bottom:0;
+        height: 25vh;
+    }
+
+    #drawing-area {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .ticket {
+        width: 2.7vh;
+        height: 1.8vh;
+        background-color: black;
+        border-radius: 100px;
+        border: 2px solid grey;
+        color: white;
+        font-size: 14px;
+        vertical-align: center;
+        padding-top: 0.9vh;
+        display: inline-block;
+        margin: 5px;
+        text-align: center;
+        box-shadow: 3px 3px rgba(0, 0, 0, 0.7);
+    }
+}
