@@ -20,6 +20,52 @@
 <div id="drawing-area-wrapper">
     <div id="drawing-area"></div>
 </div>
+<div id="admin-area" style="visibility: hidden">
+    <div id="participant-area"></div>
+    <div id="button-area">
+        <div id="caret" class="caret caret-bottom"></div>
+        <button type="button" onclick="start()">Start trekning</button>
+        <button type="button" onclick="reset()">Tilbakestill trekning</button>
+    </div>
+    <div id="settings-area">
+        <div class="admin-settings" id="settings-ticketsPerPerson">
+            <label>
+                Brikker per person: <span id="settings-ticketPerPerson-span">4</span>
+                <br>
+                <input type="range" min="1" max="5" value="4"/>
+            </label>
+        </div>
+        <div class="admin-settings" id="settings-timePerDraw">
+            <label>
+                Sekunder mellom hver trekning: <span id="settings-timePerDraw-span">3</span>
+                <br>
+                <input type="range" min="1" max="10" value="3"/>
+            </label>
+        </div>
+        <div class="admin-settings" id="settings-delayOnConsolationPrize">
+            <label>
+                Sekunder pause når trøstepremien er trukket: <span id="settings-delayOnConsolationPrize-span">3</span>
+                <br>
+                <input type="range" min="1" max="10" value="3"/>
+            </label>
+        </div>
+        <div class="admin-settings" id="settings-delayOnTwoLeft">
+            <label>
+                Sekunder pause når 2 personer gjenstår: <span id="settings-delayOnTwoLeft-span">4</span>
+                <br>
+                <input type="range" min="1" max="10" value="4"/>
+            </label>
+        </div>
+        <div class="admin-settings" id="settings-ticketsPerDraw">
+            <label>
+                Brikker som trekkes samtidig: <span id="settings-ticketsPerDraw-span">1</span>
+                <br>
+                <input type="range" min="1" max="5" value="1"/>
+            </label>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
+

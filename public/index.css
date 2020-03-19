@@ -1,5 +1,6 @@
 body {
     background-color: #4a0000;
+    margin:0;
 }
 
 .player-column {
@@ -34,7 +35,7 @@ body {
 
 .name-tag h6 {
     text-align: center;
-    margin: 0;
+    margin: 0 0 -3px 0;
     font-size: 1.12vw;
 }
 
@@ -42,20 +43,27 @@ body {
     margin: auto;
 }
 
+.name-tag-ticket-area-wrapper{
+    display: flex;
+    height: calc(100% - 1.12vw);
+    align-items: center;
+}
+
 .ticket {
-    width: 3vw;
-    height: 2vw;
-    background-color: black;
+    width: 2.7vw;
+    height: 1.8vw;
+    background-color: #111;
     border-radius: 100px;
     border: 2px solid grey;
     color: white;
     font-size: 1vw;
     vertical-align: center;
-    padding-top: 1vw;
+    padding-top: 0.9vw;
     display: inline-block;
-    margin: 5px;
+    margin: 3px;
     text-align: center;
-    box-shadow: 3px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 1px rgba(0, 0, 0, 0.7);
+    z-index: 100;
 }
 
 
@@ -87,28 +95,66 @@ body {
 }
 
 #drawing-area {
-    width: calc(40% - 80px);
-    margin-left: calc(30% + 40px);
+    width: calc(40% - 60px);
+    margin-left: calc(30% + 30px);
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
-#drawing-area div {
+#admin-area{
+    background-color: beige;
+    width: calc(100% - 10px);
+    position: fixed;
+    bottom: -1vh;
+    height: 30vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 10px 0;
+    margin: 0 5px;
+    border-top: 1px solid black;
+    border-radius: 10px;
+    transition: bottom 0.5s ease-out;
+    z-index: 1000;
+}
+
+#admin-area > div{
+    width: 100%
+}
+
+#participant-area{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+#participant-area label{
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 25%;
+}
+
+#button-area{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
 }
 
 
 @media screen and (orientation: portrait){
     .player-column {
         width: 48%;
-        height: 75%;
+        height: 55%;
         border: none;
     }
 
     #drawing-area-wrapper {
         position: absolute;
         bottom:0;
-        height: 25vh;
+        height: 40vh;
     }
 
     #drawing-area {
@@ -117,21 +163,111 @@ body {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        align-content: flex-end;
+        justify-content: center;
     }
 
     .ticket {
         width: 2.7vh;
         height: 1.8vh;
-        background-color: black;
-        border-radius: 100px;
-        border: 2px solid grey;
-        color: white;
-        font-size: 14px;
-        vertical-align: center;
+        font-size: 1vh;
         padding-top: 0.9vh;
-        display: inline-block;
-        margin: 5px;
-        text-align: center;
-        box-shadow: 3px 3px rgba(0, 0, 0, 0.7);
     }
+}
+
+
+.caret {
+    cursor: pointer;
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.caret:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+}
+
+.caret:after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+}
+
+.caret-top:before{
+    border-bottom: 30px solid #565353;
+}
+
+.caret-top:after{
+    border-bottom: 20px solid beige;
+    top: 10px;
+}
+
+.caret-bottom:before{
+    border-top: 30px solid #565353;
+}
+
+.caret-bottom:after{
+    border-top: 20px solid beige;
+    top: 0;
+}
+
+button{
+    cursor: pointer;
+    margin: 30px;
+    border-radius: 2px;
+    width: 140px;
+    height: 40px;
+}
+
+.first{
+    background-color: goldenrod;
+}
+
+.second{
+    background-color: silver;
+}
+
+.consolation{
+    background-color: lightblue;
+}
+
+.move{
+    --speed: 2s;
+    --start-pos-x: 1px;
+    --end-pos-x: 1px;
+    --start-pos-y: 1px;
+    --end-pos-y: 1px;
+    --middle-pos-x: 1px;
+    --middle-pos-y: 1px;
+    position: relative;
+    -webkit-animation: pick var(--speed) ease 0s 1 normal forwards;
+    -o-animation: pick var(--speed) ease 0s 1 normal forwards;
+    animation: pick var(--speed) ease 0s 1 normal forwards;
+    animation-iteration-count: 1;
+    transform: translate(calc(var(--start-pos-x) - var(--end-pos-x)), calc(var(--start-pos-y) - var(--end-pos-y)));
+}
+
+@keyframes pick {
+    0%{
+        transform: translate(calc(var(--start-pos-x) - var(--end-pos-x)), calc(var(--start-pos-y) - var(--end-pos-y)));
+        z-index: 101;
+    }
+
+    50%{
+        transform: translate(calc(var(--middle-pos-x) - var(--end-pos-x)), calc(var(--middle-pos-y) - var(--end-pos-y))) scale(2);
+        z-index: 200;
+    }
+
+    100%{
+        transform: none;
+        z-index: 101;
+    }
+
 }

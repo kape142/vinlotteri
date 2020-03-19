@@ -6,7 +6,7 @@ const util = require("./util");
 
 'use strict';
 
-let logging = true;
+let logging = false;
 
 function print(...a) {
     if (logging) {
@@ -49,13 +49,13 @@ let winners = {
 
 const settings = {
     ticketsPerPerson: 4,
-    timePerDraw: 5,
+    timePerDraw: 3,
     delayOnConsolationPrize: 3,
     delayOnTwoLeft: 4,
-    ticketsPerDraw: 2,
+    ticketsPerDraw: 1,
 };
 
-let drawnTickets = ["none"];
+let drawnTickets = [];
 let discardedMap = {};
 let delay = settings.timePerDraw;
 
@@ -76,7 +76,11 @@ app.ws("/join", (ws, req) => {
     if(tickets.length > 0){
         ws.send(JSON.stringify(getClientData()))
     }
-    ws.on("message", print);
+    ws.on("message", msg=>{
+        if(msg!=="heroku refresh"){
+            print(msg);
+        }
+    });
     ws.on("close", (code, reason) => {
         let i = clientsWS.indexOf(ws);
         if (i > -1)
@@ -88,13 +92,14 @@ app.ws("/join", (ws, req) => {
 
 function pullAndUpdate() {
     if(delay>0){
-        return delay-=settings.timePerDraw
-    }
-    drawnTickets = [];
-    for (let i = 0; i < settings.ticketsPerDraw; i++) {
-        drawnTickets.push(pullOne());
-        if (winners.first !== "none")
-            break;
+        delay-=settings.timePerDraw
+    }else{
+        drawnTickets = [];
+        for (let i = 0; i < settings.ticketsPerDraw; i++) {
+            drawnTickets.push(pullOne());
+            if (delay>0 || winners.first !== "none")
+                break;
+        }
     }
     clientsWS.forEach(a => a.send(JSON.stringify(getClientData())))
 }
@@ -107,31 +112,41 @@ function pullOne() {
     else {
         discardedMap[lastTicket] = 1
     }
-    if (discardedMap[lastTicket] === 2 && winners.consolation === "none") {
+    if (discardedMap[lastTicket] === settings.ticketsPerPerson && winners.consolation === "none") {
         winners.consolation = lastTicket;
         delay = settings.delayOnConsolationPrize
     }
 
     let set = new Set(tickets);
     if (set.size === 2) {
-        winners.second = "next";
-        winners.first = "next";
         delay = settings.delayOnTwoLeft;
-        return;
+        return lastTicket;
     }
 
-    if(winners.first === "next"){
-        if (set.size === 1) {
-            winners.second = lastTicket;
-            winners.first = tickets[0];
-            clearInterval(updateClientsInterval)
-        }
+    if (set.size === 1) {
+        winners.second = lastTicket;
+        winners.first = tickets[0];
+        clearInterval(updateClientsInterval)
     }
 
     return lastTicket
 }
 
 let updateClientsInterval = undefined;
+
+function reset(){
+    clearInterval(updateClientsInterval);
+    winners = {
+        consolation: "none",
+        second: "none",
+        first: "none"
+    };
+    tickets = [];
+    discardedMap = {};
+    drawnTickets = [];
+    delay = settings.timePerDraw;
+    clientsWS.forEach(a => a.send(JSON.stringify(Object.assign(getClientData(),{reset:true}))))
+}
 
 function start() {
     tickets = util.shuffle(participants.map(a => util.arrayWithCopies(a, settings.ticketsPerPerson)).flat());
@@ -141,7 +156,7 @@ function start() {
 }
 
 
-app.get("/names", (req, res) => {
+app.get("/participants", (req, res) => {
     res.status(200).send({names: participants});
 });
 
@@ -162,7 +177,29 @@ app.post("/authenticate", (req, res) => {
         }
     }
     print("Authenticated\n");
-    res.status(200).send({token})
+    res.status(200).send({token, settings, names, participants})
+});
+
+
+
+app.put("/admin/toggleperson", (req, res) => {
+    if(req.body.value){
+        if(!participants.includes(req.body.name)){
+            participants.push(req.body.name);
+            participants.sort();
+        }
+    }else{
+        let index = participants.indexOf(req.body.name);
+        if(index > -1){
+            participants.splice(index, 1);
+        }
+    }
+    return res.status(200).send()
+});
+
+app.put("/admin/settings", (req, res) => {
+    Object.assign(settings, req.body.settings);
+    return res.status(200).send()
 });
 
 app.put("/admin/logging", (req, res) => {
@@ -173,7 +210,13 @@ app.put("/admin/logging", (req, res) => {
 
 app.put("/admin/start", (req, res) => {
     start();
-    console.log("game starting");
+    print("game starting");
+    return res.status(200).send()
+});
+
+app.put("/admin/reset", (req, res) => {
+    reset();
+    print("game reset");
     return res.status(200).send()
 });
 
