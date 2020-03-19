@@ -1,4 +1,4 @@
-let logging = true;
+let logging = false;
 
 function print(...a) {
     if (logging) {
@@ -50,12 +50,6 @@ const baseHeader = () => {
 
 let keysTyped = [];
 
-let winners = {
-    consolation: "none",
-    first: "none",
-    second: "none"
-};
-
 let ticketObjects = {};
 let initiated = false;
 
@@ -77,14 +71,30 @@ function connectWS() {
     };
 }
 
+function placingToClassMap(placing) {
+    if (placing === "consolation")
+        return "consolation";
+    if (placing === "loser")
+        return "loser";
+    placing = Number(placing);
+    if (placing > 3)
+        return "winner";
+    switch (placing) {
+        case 3:
+            return "third";
+        case 2:
+            return "second";
+        case 1:
+            return "first";
+        default:
+            print("no placing: ", placing);
+    }
+}
+
 function update(data) {
+    print(data);
     if (data.reset) {
-        winners = {
-            consolation: "none",
-            first: "none",
-            second: "none"
-        };
-        document.querySelectorAll(".first, .second, .consolation").forEach(a => a.className = "name-tag");
+        document.querySelectorAll(".first, .second, .third, .winner, .loser, .consolation").forEach(a => a.className = "name-tag");
         Object.keys(ticketObjects).map(a => ticketObjects[a]).forEach(a => {
             a.element.remove();
         });
@@ -94,10 +104,13 @@ function update(data) {
     }
 
     setTimeout(() => {
-        Object.keys(data.winners).filter(a => winners[a] !== data.winners[a]).forEach(a => {
-            print(a, data.winners, winners);
-            winners[a] = data.winners[a];
-            document.getElementById(`${data.winners[a]}-name-tag`).classList.add(a);
+        Object.keys(data.discardedMap).filter(a=>data.discardedMap[a].placing !== "none").forEach(a => {
+            document.getElementById(`${a}-name-tag`).className = "name-tag "+(placingToClassMap(data.discardedMap[a].placing));
+            if(Number(data.discardedMap[a].placing)){
+                let placing = document.getElementById(a+"-name-tag-placing");
+                placing.style.visibility = "visible";
+                placing.textContent = "#"+data.discardedMap[a].placing
+            }
         });
     }, initiated ? (data.settings.timePerDraw * 1000) : 0);
 
@@ -128,7 +141,7 @@ function update(data) {
     let toggleElements = [];
 
     for (let key in data.discardedMap) {
-        for (let i = 0; i < data.discardedMap[key]; i++) {
+        for (let i = 0; i < data.discardedMap[key].amount; i++) {
             let obj = ticketObjects[key + i];
             let oldElement = obj.element;
             if (!obj.drawn) {
@@ -162,6 +175,8 @@ function update(data) {
         return;
     }
 
+    let totalTickets = data.drawnTickets.length;
+
     let drawnTickets = data.drawnTickets.reduce((acc, curr) => {
         if (Object.keys(acc).includes(curr)) {
             acc[curr].amount++;
@@ -174,7 +189,7 @@ function update(data) {
 
     setTimeout(() => {
         toggleElements.forEach(a => {
-            a.style.visibility = a.style.visibility==="hidden"?"visible":"hidden";
+            a.style.visibility = a.style.visibility === "hidden" ? "visible" : "hidden";
         });
         let index = 0;
         for (let key in drawnTickets) {
@@ -193,7 +208,7 @@ function update(data) {
                 element.style.setProperty("--start-pos-y", `${obj.rect.y}px`);
                 element.style.setProperty("--end-pos-x", `${rect.x}px`);
                 element.style.setProperty("--end-pos-y", `${rect.y}px`);
-                element.style.setProperty("--middle-pos-x", `${(50 + (Math.floor((index + 1) / 2)) * 6 * (((index % 2) * 2) - 1)) - (((1 + data.settings.ticketsPerDraw) % 2) * 3)}vw`);
+                element.style.setProperty("--middle-pos-x", `${(50 + (Math.floor((index + 1) / 2)) * 6 * (((index % 2) * 2) - 1)) - (((1 + totalTickets) % 2) * 3)}vw`);
                 element.style.setProperty("--middle-pos-y", "50vh");
                 element.classList.add("move");
                 index++;
@@ -304,7 +319,6 @@ let loggingServer = (value) => {
 let toggleAdminInput = value => Array.from(document.querySelectorAll("#admin-area input")).forEach(a => a.disabled = !value);
 
 
-
 let start = () => {
     toggleAdminInput(false);
     fetch("admin/start", {
@@ -316,7 +330,7 @@ let start = () => {
 
 let pause = () => {
     paused = !paused;
-    pauseButton.textContent = paused?"Fortsett trekningen":"Pause trekningen";
+    pauseButton.textContent = paused ? "Fortsett trekningen" : "Pause trekningen";
     fetch("admin/pause", {
         method: "PUT",
         headers: baseHeader(),
@@ -330,6 +344,7 @@ let reset = () => {
     resetButton.disabled = true;
     startButton.disabled = false;
     toggleAdminInput(true);
+    Array.from(document.getElementsByClassName("name-tag-placing")).forEach(a=>a.style.visibility = "hidden");
     fetch("admin/reset", {
         method: "PUT",
         headers: baseHeader()
@@ -360,8 +375,17 @@ function nameTag(name) {
     let div = document.createElement("div");
     div.id = name + "-name-tag";
     div.className = "name-tag";
-    let h6 = document.createElement("h6");
-    h6.textContent = name;
+    let titlediv = document.createElement("div");
+    titlediv.className = "name-tag-title";
+    let namediv = document.createElement("div");
+    namediv.textContent = name;
+    namediv.className = "name-tag-name";
+    let placingdiv = document.createElement("div");
+    placingdiv.id = name+"-name-tag-placing";
+    placingdiv.className = "name-tag-placing";
+    titlediv.appendChild(document.createElement("div"));
+    titlediv.appendChild(namediv);
+    titlediv.appendChild(placingdiv);
     let ticketAreaWrapper = document.createElement("div");
     ticketAreaWrapper.className = "name-tag-ticket-area-wrapper";
     let ticketArea = document.createElement("div");
@@ -369,7 +393,7 @@ function nameTag(name) {
     ticketArea.className = "name-tag-ticket-area";
     ticketArea.style.width = ticketWidth + (ticketsPerPerson - 1) * (ticketWidth - 15) + "px";
     ticketAreaWrapper.appendChild(ticketArea);
-    div.appendChild(h6);
+    div.appendChild(titlediv);
     div.appendChild(ticketAreaWrapper);
     return div;
 }

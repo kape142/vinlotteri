@@ -6,7 +6,7 @@ const util = require("./util");
 
 'use strict';
 
-let logging = true;
+let logging = false;
 
 function print(...a) {
     if (logging) {
@@ -34,7 +34,7 @@ app.use("/", (req, res, next) => {
 
 const port = process.env.PORT || 80;
 const httpServer = http.createServer(app);
-const expressWsServer = expressWs(app, httpServer);
+expressWs(app, httpServer);
 const token = util.makeid(30);
 
 const names = ['AE', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV', 'KB', 'KIMS', 'KSM', 'LOB', 'MAJ', 'MLA', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'YN'];
@@ -43,8 +43,6 @@ let participants = names.slice();
 let tickets = [];
 let winners = {
     consolation: "none",
-    second: "none",
-    first: "none"
 };
 
 const settings = {
@@ -53,12 +51,15 @@ const settings = {
     delayOnConsolationPrize: 3,
     delayOnTwoLeft: 4,
     ticketsPerDraw: 1,
+    winners: 2
 };
+
 
 let drawnTickets = [];
 let discardedMap = {};
 let delay = settings.timePerDraw;
 let paused = false;
+let winnersLeft = settings.winners;
 
 function getClientData() {
     return {
@@ -73,8 +74,8 @@ function getClientData() {
 
 let clientsWS = [];
 
-app.ws("/join", (ws, req) => {
-    if(tickets.length > 0){
+app.ws("/join", (ws) => {
+    if(Object.keys(discardedMap).length > 0){
         ws.send(JSON.stringify(getClientData()))
     }
     ws.on("message", msg=>{
@@ -98,7 +99,7 @@ function pullAndUpdate() {
         drawnTickets = [];
         for (let i = 0; i < settings.ticketsPerDraw; i++) {
             drawnTickets.push(pullOne());
-            if (delay>0 || winners.first !== "none")
+            if (delay>0 || tickets.length === 1)
                 break;
         }
     }
@@ -108,25 +109,36 @@ function pullAndUpdate() {
 function pullOne() {
     let randomIndex = Math.floor(Math.random() * tickets.length);
     let lastTicket = tickets.splice(randomIndex, 1)[0];
-    if (discardedMap[lastTicket])
-        discardedMap[lastTicket]++;
-    else {
-        discardedMap[lastTicket] = 1
+    if (discardedMap[lastTicket]) {
+        discardedMap[lastTicket].amount++;
+        if(discardedMap[lastTicket].amount === settings.ticketsPerPerson){
+            discardedMap[lastTicket].placing = "loser";
+        }
     }
-    if (discardedMap[lastTicket] === settings.ticketsPerPerson && winners.consolation === "none") {
+    else {
+        discardedMap[lastTicket] = {
+            amount: 1,
+            placing: "none"
+        }
+    }
+    if (discardedMap[lastTicket].amount === settings.ticketsPerPerson && winners.consolation === "none") {
+        discardedMap[lastTicket].placing = "consolation";
         winners.consolation = lastTicket;
         delay = settings.delayOnConsolationPrize
     }
-
-    let set = new Set(tickets);
-    if (set.size === 2) {
+    if(tickets.length <= (winnersLeft+1)){
         delay = settings.delayOnTwoLeft;
-        return lastTicket;
     }
 
-    if (set.size === 1) {
-        winners.second = lastTicket;
-        winners.first = tickets[0];
+    if(tickets.length < winnersLeft){
+        discardedMap[lastTicket].placing = winnersLeft;
+        winners[winnersLeft] = lastTicket;
+        winnersLeft--;
+    }
+
+    if(tickets.length === 1){
+        delay = 0;
+        setTimeout(pullAndUpdate, 1000);
         clearInterval(updateClientsInterval)
     }
 
@@ -139,8 +151,6 @@ function reset(){
     clearInterval(updateClientsInterval);
     winners = {
         consolation: "none",
-        second: "none",
-        first: "none"
     };
     tickets = [];
     discardedMap = {};
@@ -150,6 +160,7 @@ function reset(){
 }
 
 function start() {
+    winnersLeft = settings.winners;
     tickets = util.shuffle(participants.map(a => util.arrayWithCopies(a, settings.ticketsPerPerson)).flat());
     clearInterval(updateClientsInterval);
     pullAndUpdate();
