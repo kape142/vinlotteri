@@ -6,7 +6,7 @@ const util = require("./util");
 
 'use strict';
 
-let logging = false;
+let logging = true;
 
 function print(...a) {
     if (logging) {
@@ -58,6 +58,7 @@ const settings = {
 let drawnTickets = [];
 let discardedMap = {};
 let delay = settings.timePerDraw;
+let paused = false;
 
 function getClientData() {
     return {
@@ -91,7 +92,7 @@ app.ws("/join", (ws, req) => {
 });
 
 function pullAndUpdate() {
-    if(delay>0){
+    if(delay>0 || paused){
         delay-=settings.timePerDraw
     }else{
         drawnTickets = [];
@@ -211,6 +212,12 @@ app.put("/admin/logging", (req, res) => {
 app.put("/admin/start", (req, res) => {
     start();
     print("game starting");
+    return res.status(200).send()
+});
+
+app.put("/admin/pause", (req, res) => {
+    paused = req.body.paused;
+    print("game paused");
     return res.status(200).send()
 });
 

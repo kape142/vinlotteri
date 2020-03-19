@@ -24,8 +24,9 @@
     <div id="participant-area"></div>
     <div id="button-area">
         <div id="caret" class="caret caret-bottom"></div>
-        <button type="button" onclick="start()">Start trekning</button>
-        <button type="button" onclick="reset()">Tilbakestill trekning</button>
+        <button type="button" id="button-start" onclick="start()">Start trekning</button>
+        <button type="button" id="button-pause" disabled onclick="pause()">Pause trekningen</button>
+        <button type="button" id="button-reset" disabled onclick="reset()">Tilbakestill trekning</button>
     </div>
     <div id="settings-area">
         <div class="admin-settings" id="settings-ticketsPerPerson">

@@ -1,4 +1,4 @@
-let logging = false;
+let logging = true;
 
 function print(...a) {
     if (logging) {
@@ -8,7 +8,11 @@ function print(...a) {
 
 let drawingArea;
 let areas;
+let startButton;
+let pauseButton;
+let resetButton;
 let ticketWidth;
+let paused = false;
 
 
 function findTicketWidth() {
@@ -25,6 +29,9 @@ function findTicketWidth() {
 window.onload = () => {
     drawingArea = document.getElementById("drawing-area");
     areas = Array.from(document.getElementsByClassName("player-column-lane"));
+    pauseButton = document.getElementById("button-pause");
+    resetButton = document.getElementById("button-reset");
+    startButton = document.getElementById("button-start");
     findTicketWidth();
     fetchAndUpdateNames().then(() => {
         connectWS()
@@ -147,6 +154,10 @@ function update(data) {
         }
     }
     if (!initiated) {
+        print("initiated");
+        pauseButton.disabled = false;
+        resetButton.disabled = false;
+        startButton.disabled = true;
         initiated = true;
         return;
     }
@@ -292,6 +303,8 @@ let loggingServer = (value) => {
 
 let toggleAdminInput = value => Array.from(document.querySelectorAll("#admin-area input")).forEach(a => a.disabled = !value);
 
+
+
 let start = () => {
     toggleAdminInput(false);
     fetch("admin/start", {
@@ -301,7 +314,21 @@ let start = () => {
         .catch(print)
 };
 
+let pause = () => {
+    paused = !paused;
+    pauseButton.textContent = paused?"Fortsett trekningen":"Pause trekningen";
+    fetch("admin/pause", {
+        method: "PUT",
+        headers: baseHeader(),
+        body: JSON.stringify({paused})
+    })
+        .catch(print)
+};
+
 let reset = () => {
+    pauseButton.disabled = true;
+    resetButton.disabled = true;
+    startButton.disabled = false;
     toggleAdminInput(true);
     fetch("admin/reset", {
         method: "PUT",

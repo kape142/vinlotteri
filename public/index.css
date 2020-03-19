@@ -223,7 +223,11 @@ button{
     margin: 30px;
     border-radius: 2px;
     width: 140px;
-    height: 40px;
+    height: 60px;
+}
+
+button:disabled{
+    cursor: unset;
 }
 
 .first{
