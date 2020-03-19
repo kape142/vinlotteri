@@ -1,6 +1,6 @@
 body {
     background-color: #4a0000;
-    margin:0;
+    margin: 0;
     font-family: Georgia, serif
 
 }
@@ -53,7 +53,7 @@ body {
     font-weight: bold;
 }
 
-.name-tag-placing{
+.name-tag-placing {
     width: 50% !important;
     text-align: center;
     margin-left: 16.67%;
@@ -61,7 +61,7 @@ body {
 }
 
 
-.name-tag-title{
+.name-tag-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -72,7 +72,7 @@ body {
     margin: auto;
 }
 
-.name-tag-ticket-area-wrapper{
+.name-tag-ticket-area-wrapper {
     display: flex;
     height: calc(100% - 1.12vw);
     align-items: center;
@@ -133,7 +133,7 @@ body {
     justify-content: center;
 }
 
-#admin-area{
+#admin-area {
     background-color: beige;
     width: calc(100% - 10px);
     position: fixed;
@@ -150,23 +150,23 @@ body {
     z-index: 1000;
 }
 
-#admin-area > div{
+#admin-area > div {
     width: 100%
 }
 
-#participant-area{
+#participant-area {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
 }
 
-#participant-area label{
+#participant-area label {
     display: flex;
     justify-content: flex-end;
     margin-right: 25%;
 }
 
-#button-area{
+#button-area {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -174,7 +174,7 @@ body {
 }
 
 
-@media screen and (orientation: portrait){
+@media screen and (orientation: portrait) {
     .player-column {
         width: 48%;
         height: 55%;
@@ -183,7 +183,7 @@ body {
 
     #drawing-area-wrapper {
         position: absolute;
-        bottom:0;
+        bottom: 0;
         height: 40vh;
     }
 
@@ -230,25 +230,25 @@ body {
     border-right: 20px solid transparent;
 }
 
-.caret-top:before{
+.caret-top:before {
     border-bottom: 30px solid #565353;
 }
 
-.caret-top:after{
+.caret-top:after {
     border-bottom: 20px solid beige;
     top: 10px;
 }
 
-.caret-bottom:before{
+.caret-bottom:before {
     border-top: 30px solid #565353;
 }
 
-.caret-bottom:after{
+.caret-bottom:after {
     border-top: 20px solid beige;
     top: 0;
 }
 
-button{
+button {
     cursor: pointer;
     margin: 30px;
     border-radius: 2px;
@@ -256,35 +256,35 @@ button{
     height: 60px;
 }
 
-button:disabled{
+button:disabled {
     cursor: unset;
 }
 
-.first{
+.first {
     background-color: goldenrod;
 }
 
-.second{
+.second {
     background-color: #dedede;
 }
 
-.third{
+.third {
     background-color: #dc8127;
 }
 
-.winner{
+.winner {
     background-color: lightgreen;
 }
 
-.loser{
+.loser {
     background-color: #565353;
 }
 
-.consolation{
+.consolation {
     background-color: lightblue;
 }
 
-.move{
+.move {
     --speed: 2s;
     --start-pos-x: 1px;
     --end-pos-x: 1px;
@@ -301,17 +301,17 @@ button:disabled{
 }
 
 @keyframes pick {
-    0%{
+    0% {
         transform: translate(calc(var(--start-pos-x) - var(--end-pos-x)), calc(var(--start-pos-y) - var(--end-pos-y)));
         z-index: 101;
     }
 
-    50%{
+    50% {
         transform: translate(calc(var(--middle-pos-x) - var(--end-pos-x)), calc(var(--middle-pos-y) - var(--end-pos-y))) scale(2);
         z-index: 200;
     }
 
-    100%{
+    100% {
         transform: none;
         z-index: 101;
     }

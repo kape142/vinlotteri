@@ -21,14 +21,14 @@ function shuffle(array) {
         temporaryValue = array[currentIndex];
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
-}
+    }
 
     return array;
 }
 
-function arrayWithCopies(element, copies){
+function arrayWithCopies(element, copies) {
     let arr = [];
-    for(let i = 0; i < copies; i++){
+    for (let i = 0; i < copies; i++) {
         arr.push(element);
     }
     return arr;

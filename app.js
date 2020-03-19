@@ -75,11 +75,11 @@ function getClientData() {
 let clientsWS = [];
 
 app.ws("/join", (ws) => {
-    if(Object.keys(discardedMap).length > 0){
+    if (Object.keys(discardedMap).length > 0) {
         ws.send(JSON.stringify(getClientData()))
     }
-    ws.on("message", msg=>{
-        if(msg!=="heroku refresh"){
+    ws.on("message", msg => {
+        if (msg !== "heroku refresh") {
             print(msg);
         }
     });
@@ -93,13 +93,13 @@ app.ws("/join", (ws) => {
 });
 
 function pullAndUpdate() {
-    if(delay>0 || paused){
-        delay-=settings.timePerDraw
-    }else{
+    if (delay > 0 || paused) {
+        delay -= settings.timePerDraw
+    } else {
         drawnTickets = [];
         for (let i = 0; i < settings.ticketsPerDraw; i++) {
             drawnTickets.push(pullOne());
-            if (delay>0 || tickets.length === 1)
+            if (delay > 0 || tickets.length === 1)
                 break;
         }
     }
@@ -111,11 +111,10 @@ function pullOne() {
     let lastTicket = tickets.splice(randomIndex, 1)[0];
     if (discardedMap[lastTicket]) {
         discardedMap[lastTicket].amount++;
-        if(discardedMap[lastTicket].amount === settings.ticketsPerPerson){
+        if (discardedMap[lastTicket].amount === settings.ticketsPerPerson) {
             discardedMap[lastTicket].placing = "loser";
         }
-    }
-    else {
+    } else {
         discardedMap[lastTicket] = {
             amount: 1,
             placing: "none"
@@ -126,17 +125,17 @@ function pullOne() {
         winners.consolation = lastTicket;
         delay = settings.delayOnConsolationPrize
     }
-    if(tickets.length <= (winnersLeft+1)){
+    if (tickets.length <= (winnersLeft + 1)) {
         delay = settings.delayOnTwoLeft;
     }
 
-    if(tickets.length < winnersLeft){
+    if (tickets.length < winnersLeft) {
         discardedMap[lastTicket].placing = winnersLeft;
         winners[winnersLeft] = lastTicket;
         winnersLeft--;
     }
 
-    if(tickets.length === 1){
+    if (tickets.length === 1) {
         delay = 0;
         setTimeout(pullAndUpdate, 1000);
         clearInterval(updateClientsInterval)
@@ -147,7 +146,7 @@ function pullOne() {
 
 let updateClientsInterval = undefined;
 
-function reset(){
+function reset() {
     clearInterval(updateClientsInterval);
     winners = {
         consolation: "none",
@@ -156,7 +155,7 @@ function reset(){
     discardedMap = {};
     drawnTickets = [];
     delay = settings.timePerDraw;
-    clientsWS.forEach(a => a.send(JSON.stringify(Object.assign(getClientData(),{reset:true}))))
+    clientsWS.forEach(a => a.send(JSON.stringify(Object.assign(getClientData(), {reset: true}))))
 }
 
 function start() {
@@ -193,16 +192,15 @@ app.post("/authenticate", (req, res) => {
 });
 
 
-
 app.put("/admin/toggleperson", (req, res) => {
-    if(req.body.value){
-        if(!participants.includes(req.body.name)){
+    if (req.body.value) {
+        if (!participants.includes(req.body.name)) {
             participants.push(req.body.name);
             participants.sort();
         }
-    }else{
+    } else {
         let index = participants.indexOf(req.body.name);
-        if(index > -1){
+        if (index > -1) {
             participants.splice(index, 1);
         }
     }

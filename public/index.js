@@ -104,12 +104,12 @@ function update(data) {
     }
 
     setTimeout(() => {
-        Object.keys(data.discardedMap).filter(a=>data.discardedMap[a].placing !== "none").forEach(a => {
-            document.getElementById(`${a}-name-tag`).className = "name-tag "+(placingToClassMap(data.discardedMap[a].placing));
-            if(Number(data.discardedMap[a].placing)){
-                let placing = document.getElementById(a+"-name-tag-placing");
+        Object.keys(data.discardedMap).filter(a => data.discardedMap[a].placing !== "none").forEach(a => {
+            document.getElementById(`${a}-name-tag`).className = "name-tag " + (placingToClassMap(data.discardedMap[a].placing));
+            if (Number(data.discardedMap[a].placing)) {
+                let placing = document.getElementById(a + "-name-tag-placing");
                 placing.style.visibility = "visible";
-                placing.textContent = "#"+data.discardedMap[a].placing
+                placing.textContent = "#" + data.discardedMap[a].placing
             }
         });
     }, initiated ? (data.settings.timePerDraw * 1000) : 0);
@@ -344,7 +344,7 @@ let reset = () => {
     resetButton.disabled = true;
     startButton.disabled = false;
     toggleAdminInput(true);
-    Array.from(document.getElementsByClassName("name-tag-placing")).forEach(a=>a.style.visibility = "hidden");
+    Array.from(document.getElementsByClassName("name-tag-placing")).forEach(a => a.style.visibility = "hidden");
     fetch("admin/reset", {
         method: "PUT",
         headers: baseHeader()
@@ -381,7 +381,7 @@ function nameTag(name) {
     namediv.textContent = name;
     namediv.className = "name-tag-name";
     let placingdiv = document.createElement("div");
-    placingdiv.id = name+"-name-tag-placing";
+    placingdiv.id = name + "-name-tag-placing";
     placingdiv.className = "name-tag-placing";
     titlediv.appendChild(document.createElement("div"));
     titlediv.appendChild(namediv);
