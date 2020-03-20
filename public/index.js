@@ -94,6 +94,7 @@ function placingToClassMap(placing) {
 function update(data) {
     print(data);
     if (data.reset) {
+        Array.from(document.getElementsByClassName("name-tag-placing")).forEach(a=>a.style.visibility = "hidden");
         document.querySelectorAll(".first, .second, .third, .winner, .loser, .consolation").forEach(a => a.className = "name-tag");
         Object.keys(ticketObjects).map(a => ticketObjects[a]).forEach(a => {
             a.element.remove();
@@ -344,7 +345,6 @@ let reset = () => {
     resetButton.disabled = true;
     startButton.disabled = false;
     toggleAdminInput(true);
-    Array.from(document.getElementsByClassName("name-tag-placing")).forEach(a => a.style.visibility = "hidden");
     fetch("admin/reset", {
         method: "PUT",
         headers: baseHeader()

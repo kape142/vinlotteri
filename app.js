@@ -6,7 +6,7 @@ const util = require("./util");
 
 'use strict';
 
-let logging = false;
+let logging = true;
 
 function print(...a) {
     if (logging) {
@@ -30,6 +30,13 @@ app.use("/", (req, res, next) => {
         print("body: ", req.body, "\n")
     }
     next()
+});
+
+app.get('*', function(req,res,next) {
+    if(req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production')
+        res.redirect(301, 'https://'+req.hostname+req.url);
+    else
+        next()
 });
 
 const port = process.env.PORT || 80;
