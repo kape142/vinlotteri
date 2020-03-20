@@ -21,6 +21,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 
+app.get('*', function(req,res,next) {
+    if(req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production')
+        res.redirect(301, 'https://'+req.hostname+req.url);
+    else
+        next()
+});
+
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
@@ -32,12 +39,7 @@ app.use("/", (req, res, next) => {
     next()
 });
 
-app.get('*', function(req,res,next) {
-    if(req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production')
-        res.redirect(301, 'https://'+req.hostname+req.url);
-    else
-        next()
-});
+
 
 const port = process.env.PORT || 80;
 const httpServer = http.createServer(app);
