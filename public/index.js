@@ -205,17 +205,21 @@ function update(data) {
                 let element = obj.element;
                 let rect = element.getBoundingClientRect();
                 element.style.setProperty("--speed", `${data.settings.timePerDraw}s`);
-                element.style.setProperty("--start-pos-x", `${obj.rect.x}px`);
-                element.style.setProperty("--start-pos-y", `${obj.rect.y}px`);
-                element.style.setProperty("--end-pos-x", `${rect.x}px`);
-                element.style.setProperty("--end-pos-y", `${rect.y}px`);
+                element.style.setProperty("--start-pos-x", `${obj.rect.left}px`);
+                element.style.setProperty("--start-pos-y", `${obj.rect.top}px`);
+                element.style.setProperty("--end-pos-x", `${rect.left}px`);
+                element.style.setProperty("--end-pos-y", `${rect.top}px`);
                 element.style.setProperty("--middle-pos-x", `${(50 + (Math.floor((index + 1) / 2)) * 6 * (((index % 2) * 2) - 1)) - (((1 + totalTickets) % 2) * 3)}vw`);
                 element.style.setProperty("--middle-pos-y", "50vh");
                 element.classList.add("move");
+                //element.classList.add("ticket-recent");
                 index++;
                 setTimeout(() => {
                     element.classList.remove("move");
                 }, data.settings.timePerDraw * 1000)
+                /*setTimeout(() => {
+                    element.classList.remove("ticket-recent");
+                }, data.settings.timePerDraw * 2000)*/
             }
         }
     })
