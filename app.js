@@ -48,7 +48,7 @@ const token = util.makeid(30);
 
 const names = ['AE', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV', 'KB', 'KIMS', 'KSM', 'LOB', 'MAJ', 'MLA', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'YN'];
 
-const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 3, 4, 4, 4, 5, 5, 3, 5, 3, 4, 2, -1]
+const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2, -1]
 
 let participants = names.slice();
 participants.splice(participants.indexOf("MLA"), 1);
@@ -214,7 +214,7 @@ app.post("/authenticate", (req, res) => {
     let inputKey = req.body.key;
     for (let i = 0; i < key.length; i++) {
         if (inputKey[inputKey.length - key.length + i] !== key[i]) {
-            return res.status(403).send("Incorrect key")
+            return res.status(401).send("Incorrect key")
         }
     }
     print("Authenticated\n");

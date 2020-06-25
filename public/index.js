@@ -118,11 +118,11 @@ function update(data) {
                     //ticket.className = "ticket " + (placingToClassMap(placing));
                     let winDistance = placing/data.settings.winners;
                     ticket.style.backgroundColor = `rgb(${
-                        30+(220-220*winDistance)
+                        105+(150-150*winDistance)
                     },${
-                        10+(20-20*winDistance)
+                        30+(20-20*winDistance)
                     },${
-                        10+(20-20*winDistance)
+                        30+(20-20*winDistance)
                     })`
                     if(Number(placing) === 3){
                         ticket.style.backgroundColor = "#dc8127"

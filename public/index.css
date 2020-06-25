@@ -147,6 +147,7 @@ body {
     position: fixed;
     bottom: -1vh;
     height: 30vh;
+    min-height: 250px;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
