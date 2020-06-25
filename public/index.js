@@ -54,7 +54,7 @@ let ticketObjects = {};
 let initiated = false;
 
 let names = [];
-let ticketsPerPerson = 4;
+let ticketsPerPerson = 1;
 
 let ws;
 
@@ -95,7 +95,7 @@ function update(data) {
     print(data);
     if (data.reset) {
         Array.from(document.getElementsByClassName("name-tag-placing")).forEach(a=>a.style.visibility = "hidden");
-        document.querySelectorAll(".first, .second, .third, .winner, .loser, .consolation").forEach(a => a.className = "name-tag");
+        document.querySelectorAll(".first, .second, .third, .winner, .loser, .consolation").forEach(a => a.classList.remove("first", "second", "third", "winner", "loser", "consolation"));
         Object.keys(ticketObjects).map(a => ticketObjects[a]).forEach(a => {
             a.element.remove();
         });
@@ -106,25 +106,58 @@ function update(data) {
 
     setTimeout(() => {
         Object.keys(data.discardedMap).filter(a => data.discardedMap[a].placing !== "none").forEach(a => {
-            document.getElementById(`${a}-name-tag`).className = "name-tag " + (placingToClassMap(data.discardedMap[a].placing));
-            if (Number(data.discardedMap[a].placing)) {
-                let placing = document.getElementById(a + "-name-tag-placing");
-                placing.style.visibility = "visible";
-                placing.textContent = "#" + data.discardedMap[a].placing
+            let ticketsToGet = data.settings.ticketsPerPerson > 0 ? data.settings.ticketsPerPerson : data.customTicketsPerPerson[data.participants.indexOf(a)]
+            print(ticketsToGet, data.discardedMap[a].placing)
+            if(data.discardedMap[a].placing.length === ticketsToGet){
+                document.getElementById(`${a}-name-tag`).className = "name-tag loser";
             }
+            data.discardedMap[a].placing.forEach((placing, index) => {
+                if (Number(placing)) {
+                    document.getElementById(`${a}-name-tag`)
+                    let ticket = document.getElementById("ticket-"+a + "-"+index);
+                    //ticket.className = "ticket " + (placingToClassMap(placing));
+                    let winDistance = placing/data.settings.winners;
+                    ticket.style.backgroundColor = `rgb(${
+                        30+(220-220*winDistance)
+                    },${
+                        10+(20-20*winDistance)
+                    },${
+                        10+(20-20*winDistance)
+                    })`
+                    if(Number(placing) === 3){
+                        ticket.style.backgroundColor = "#dc8127"
+                    }
+                    if(Number(placing) === 2){
+                        ticket.style.backgroundColor = "#dedede"
+                    }
+                    if(Number(placing) === 1){
+                        ticket.style.backgroundColor = "goldenrod"
+                    }
+                    ticket.textContent = "#" + placing
+                }
+            })
         });
     }, initiated ? (data.settings.timePerDraw * 1000) : 0);
 
-    if (!initiated) {
+    if (!initiated && !data.info) {
         if (data.participants.length !== names.length || data.settings.ticketsPerPerson !== ticketsPerPerson) {
             ticketsPerPerson = data.settings.ticketsPerPerson;
+            if(ticketsPerPerson === -1){
+                document.getElementById("settings-ticketsPerPerson-input").disabled = true
+                document.getElementById("settings-ticketPerPerson-span").textContent = "Varierende"
+                document.getElementById("settings-ticketsPerPerson-checkbox").checked = true
+            }
             updateNames(data.participants);
         }
-        let order = createOrder(data.participants.length * data.settings.ticketsPerPerson);
+        let totalTickets = data.settings.ticketsPerPerson > 0 ? data.participants.length * data.settings.ticketsPerPerson :
+            data.customTicketsPerPerson.reduce((acc, cur)=>acc+cur,0);
+        let order = createOrder(totalTickets);
         let index = 0;
         for (let key in data.participants) {
             let name = data.participants[key];
-            for (let i = 0; i < data.settings.ticketsPerPerson; i++) {
+            let tickets = data.settings.ticketsPerPerson > 0 ? data.settings.ticketsPerPerson :
+                data.customTicketsPerPerson[data.participants.indexOf(name)]
+            for (let i = 0; i < tickets; i++) {
                 let element = createTicketElement(name, i);
                 element.style.order = order[index++];
                 drawingArea.appendChild(element);
@@ -167,7 +200,7 @@ function update(data) {
             }
         }
     }
-    if (!initiated) {
+    if (!initiated && !data.info) {
         print("initiated");
         pauseButton.disabled = false;
         resetButton.disabled = false;
@@ -356,6 +389,15 @@ let reset = () => {
         .catch(print)
 };
 
+let avslutningButton = () => {
+    let input = document.getElementById("settings-ticketsPerPerson-input")
+    let wasDisabled = ticketsPerPerson === -1;
+    ticketsPerPerson = wasDisabled ? Number(input.value) : -1;
+    input.disabled = !wasDisabled
+    changeSettings({ticketsPerPerson});
+    document.getElementById("settings-ticketPerPerson-span").textContent = wasDisabled ? ticketsPerPerson : "Varierende"
+}
+
 function fetchAndUpdateNames() {
     return fetch("participants").then(a => a.json()).then(a => updateNames(a.names));
 }
@@ -422,6 +464,7 @@ document.addEventListener("keydown", event => {
                 token = a.token;
                 print(token);
                 showAdminWindow(a)
+                ws.send("update");
             })
             .catch(print)
 

@@ -48,17 +48,21 @@ const token = util.makeid(30);
 
 const names = ['AE', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV', 'KB', 'KIMS', 'KSM', 'LOB', 'MAJ', 'MLA', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'YN'];
 
+const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 3, 4, 4, 4, 5, 5, 3, 5, 3, 4, 2, -1]
+
 let participants = names.slice();
+participants.splice(participants.indexOf("MLA"), 1);
+
 let tickets = [];
 let winners = {
     consolation: "none",
 };
 
 const settings = {
-    ticketsPerPerson: 4,
+    ticketsPerPerson: 1,
     timePerDraw: 3,
     delayOnConsolationPrize: 3,
-    delayOnTwoLeft: 4,
+    delayOnWinnersLeft: 4,
     ticketsPerDraw: 1,
     winners: 2
 };
@@ -77,7 +81,8 @@ function getClientData() {
         participants,
         settings,
         drawnTickets,
-        discardedMap
+        discardedMap,
+        customTicketsPerPerson
     }
 }
 
@@ -88,6 +93,9 @@ app.ws("/join", (ws) => {
         ws.send(JSON.stringify(getClientData()))
     }
     ws.on("message", msg => {
+        if(msg === "update"){
+            ws.send(JSON.stringify(Object.assign(getClientData(),{info: true})));
+        }
         if (msg !== "heroku refresh") {
             print(msg);
         }
@@ -120,35 +128,44 @@ function pullOne() {
     let lastTicket = tickets.splice(randomIndex, 1)[0];
     if (discardedMap[lastTicket]) {
         discardedMap[lastTicket].amount++;
-        if (discardedMap[lastTicket].amount === settings.ticketsPerPerson) {
-            discardedMap[lastTicket].placing = "loser";
-        }
+        discardedMap[lastTicket].placing.push("none")
     } else {
         discardedMap[lastTicket] = {
             amount: 1,
-            placing: "none"
+            placing: ["none"]
         }
     }
-    if (discardedMap[lastTicket].amount === settings.ticketsPerPerson && winners.consolation === "none") {
-        discardedMap[lastTicket].placing = "consolation";
-        winners.consolation = lastTicket;
-        delay = settings.delayOnConsolationPrize
-    }
     if (tickets.length <= (winnersLeft + 1)) {
-        delay = settings.delayOnTwoLeft;
+        delay = settings.delayOnWinnersLeft;
     }
-
-    if (tickets.length < winnersLeft) {
-        discardedMap[lastTicket].placing = winnersLeft;
+    if (tickets.length <= winnersLeft) {
+        discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = winnersLeft;
         winners[winnersLeft] = lastTicket;
         winnersLeft--;
     }
-
     if (tickets.length === 1) {
         delay = 0;
         setTimeout(pullAndUpdate, 1000);
         clearInterval(updateClientsInterval)
     }
+    if(settings.ticketsPerPerson !== -1){
+        if(settings.ticketsPerPerson > 1) {
+            if (discardedMap[lastTicket].amount === settings.ticketsPerPerson && winners.consolation === "none") {
+                discardedMap[lastTicket].placing[discardedMap[lastTicket].amount - 1] = "consolation";
+                winners.consolation = lastTicket;
+                delay = settings.delayOnConsolationPrize
+            }
+        }
+        if (discardedMap[lastTicket].amount === settings.ticketsPerPerson) {
+            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount] = "loser";
+        }
+
+    }else{
+        if (discardedMap[lastTicket].amount === customTicketsPerPerson[lastTicket]) {
+            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount] = "loser";
+        }
+    }
+
 
     return lastTicket
 }
@@ -169,7 +186,11 @@ function reset() {
 
 function start() {
     winnersLeft = settings.winners;
-    tickets = util.shuffle(participants.map(a => util.arrayWithCopies(a, settings.ticketsPerPerson)).flat());
+    if(settings.ticketsPerPerson > 0){
+        tickets = util.shuffle(participants.map(a => util.arrayWithCopies(a, settings.ticketsPerPerson)).flat());
+    }else{
+        tickets = util.shuffle(participants.map((a,i) => util.arrayWithCopies(a, customTicketsPerPerson[i])).flat());
+    }
     clearInterval(updateClientsInterval);
     pullAndUpdate();
     updateClientsInterval = setInterval(pullAndUpdate, settings.timePerDraw * 1000);
@@ -193,7 +214,7 @@ app.post("/authenticate", (req, res) => {
     let inputKey = req.body.key;
     for (let i = 0; i < key.length; i++) {
         if (inputKey[inputKey.length - key.length + i] !== key[i]) {
-            return res.status(401).send("Incorrect key")
+            return res.status(403).send("Incorrect key")
         }
     }
     print("Authenticated\n");

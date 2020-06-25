@@ -33,7 +33,8 @@
             <label>
                 Brikker per person: <span id="settings-ticketPerPerson-span">4</span>
                 <br>
-                <input type="range" min="1" max="5" value="4"/>
+                <input id="settings-ticketsPerPerson-input" type="range" min="1" max="5" value="1"/>
+                <input type="checkbox" id="settings-ticketsPerPerson-checkbox" onchange="avslutningButton()"/> Avslutning
             </label>
         </div>
         <div class="admin-settings" id="settings-timePerDraw">
@@ -68,7 +69,7 @@
             <label>
                 Antall vinnere: <span id="settings-winners-span">2</span>
                 <br>
-                <input type="range" min="1" max="5" value="2"/>
+                <input type="number" min="1" max="100" value="2" id="settings-winners-input"/>
             </label>
         </div>
     </div>
