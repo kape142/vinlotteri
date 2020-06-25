@@ -48,7 +48,7 @@ const token = util.makeid(30);
 
 const names = ['AE', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV', 'KB', 'KIMS', 'KSM', 'LOB', 'MAJ', 'MLA', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'YN'];
 
-const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2, -1]
+const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2]
 
 let participants = names.slice();
 participants.splice(participants.indexOf("MLA"), 1);
@@ -138,7 +138,7 @@ function pullOne() {
     if (tickets.length <= (winnersLeft + 1)) {
         delay = settings.delayOnWinnersLeft;
     }
-    if (tickets.length <= winnersLeft) {
+    if (tickets.length < winnersLeft) {
         discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = winnersLeft;
         winners[winnersLeft] = lastTicket;
         winnersLeft--;
@@ -165,8 +165,6 @@ function pullOne() {
             discardedMap[lastTicket].placing[discardedMap[lastTicket].amount] = "loser";
         }
     }
-
-
     return lastTicket
 }
 
