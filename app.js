@@ -21,9 +21,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 
-app.get('*', function(req,res,next) {
-    if(req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production')
-        res.redirect(301, 'https://'+req.hostname+req.url);
+app.get('*', function (req, res, next) {
+    if (req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production')
+        res.redirect(301, 'https://' + req.hostname + req.url);
     else
         next()
 });
@@ -40,15 +40,15 @@ app.use("/", (req, res, next) => {
 });
 
 
-
 const port = process.env.PORT || 80;
 const httpServer = http.createServer(app);
 expressWs(app, httpServer);
 const token = util.makeid(30);
 
-const names = ['AE', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV', 'KB', 'KIMS', 'KSM', 'LOB', 'MAJ', 'MLA', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'YN'];
+const names = ['AE', 'AF', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV',
+    'KB', 'KIMS', 'KSM', 'LOB', 'LØB', 'LMS', 'MAJ', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'VGL', 'YN'];
 
-const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 1, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2];
+const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 1, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2, 1, 1, 1];
 
 let participants = names.slice();
 
@@ -60,10 +60,9 @@ let winners = {
 const settings = {
     ticketsPerPerson: 4,
     timePerDraw: 4,
-    delayOnConsolationPrize: 5,
     delayOnWinnersLeft: 6,
     ticketsPerDraw: 1,
-    winners: 2
+    winners: 3
 };
 
 
@@ -92,8 +91,8 @@ app.ws("/join", (ws) => {
         ws.send(JSON.stringify(getClientData()))
     }
     ws.on("message", msg => {
-        if(msg === "update"){
-            ws.send(JSON.stringify(Object.assign(getClientData(),{info: true})));
+        if (msg === "update") {
+            ws.send(JSON.stringify(Object.assign(getClientData(), {info: true})));
         }
         if (msg !== "heroku refresh") {
             print(msg);
@@ -138,7 +137,7 @@ function pullOne() {
         delay = settings.delayOnWinnersLeft;
     }
     if (tickets.length < winnersLeft) {
-        discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = winnersLeft;
+        discardedMap[lastTicket].placing[discardedMap[lastTicket].amount - 1] = winnersLeft;
         winners[winnersLeft] = lastTicket;
         winnersLeft--;
     }
@@ -147,23 +146,16 @@ function pullOne() {
         setTimeout(pullAndUpdate, 1000);
         clearInterval(updateClientsInterval)
     }
-    if(settings.ticketsPerPerson !== -1){
-        if(settings.ticketsPerPerson > 1) {
+    /*
+    if (settings.ticketsPerPerson !== -1) {
+        if (settings.ticketsPerPerson > 1) {
             if (discardedMap[lastTicket].amount === settings.ticketsPerPerson && winners.consolation === "none") {
                 discardedMap[lastTicket].placing[discardedMap[lastTicket].amount - 1] = "consolation";
                 winners.consolation = lastTicket;
                 delay = settings.delayOnConsolationPrize
             }
         }
-        /*if (discardedMap[lastTicket].amount === settings.ticketsPerPerson) {
-            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = "loser";
-        }*/
-
-    }else{
-        /*if (discardedMap[lastTicket].amount === customTicketsPerPerson[lastTicket]) {
-            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = "loser";
-        }*/
-    }
+    }*/
     return lastTicket
 }
 
@@ -183,10 +175,10 @@ function reset() {
 
 function start() {
     winnersLeft = settings.winners;
-    if(settings.ticketsPerPerson > 0){
+    if (settings.ticketsPerPerson > 0) {
         tickets = util.shuffle(participants.map(a => util.arrayWithCopies(a, settings.ticketsPerPerson)).flat());
-    }else{
-        tickets = util.shuffle(participants.map((a,i) => util.arrayWithCopies(a, customTicketsPerPerson[i])).flat());
+    } else {
+        tickets = util.shuffle(participants.map((a, i) => util.arrayWithCopies(a, customTicketsPerPerson[i])).flat());
     }
     clearInterval(updateClientsInterval);
     pullAndUpdate();
