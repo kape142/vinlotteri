@@ -48,10 +48,9 @@ const token = util.makeid(30);
 
 const names = ['AE', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV', 'KB', 'KIMS', 'KSM', 'LOB', 'MAJ', 'MLA', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'YN'];
 
-const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2]
+const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 1, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2];
 
 let participants = names.slice();
-participants.splice(participants.indexOf("MLA"), 1);
 
 let tickets = [];
 let winners = {
@@ -59,10 +58,10 @@ let winners = {
 };
 
 const settings = {
-    ticketsPerPerson: 1,
-    timePerDraw: 3,
-    delayOnConsolationPrize: 3,
-    delayOnWinnersLeft: 4,
+    ticketsPerPerson: 4,
+    timePerDraw: 4,
+    delayOnConsolationPrize: 5,
+    delayOnWinnersLeft: 6,
     ticketsPerDraw: 1,
     winners: 2
 };
@@ -156,14 +155,14 @@ function pullOne() {
                 delay = settings.delayOnConsolationPrize
             }
         }
-        if (discardedMap[lastTicket].amount === settings.ticketsPerPerson) {
-            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount] = "loser";
-        }
+        /*if (discardedMap[lastTicket].amount === settings.ticketsPerPerson) {
+            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = "loser";
+        }*/
 
     }else{
-        if (discardedMap[lastTicket].amount === customTicketsPerPerson[lastTicket]) {
-            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount] = "loser";
-        }
+        /*if (discardedMap[lastTicket].amount === customTicketsPerPerson[lastTicket]) {
+            discardedMap[lastTicket].placing[discardedMap[lastTicket].amount-1] = "loser";
+        }*/
     }
     return lastTicket
 }

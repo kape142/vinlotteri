@@ -7,7 +7,7 @@ body {
 
 .player-column {
     width: 30%;
-    height: 97%;
+    height: 93%;
     position: absolute;
     background-color: beige;
     border: 1px solid black;
@@ -86,7 +86,7 @@ body {
     border: 2px solid grey;
     color: white;
     font-size: 1vw;
-    vertical-align: center;
+    vertical-align: middle;
     padding-top: 0.9vw;
     display: inline-block;
     margin: 3px;
@@ -293,7 +293,7 @@ button:disabled {
 }
 
 .loser {
-    background-color: #565353;
+    background-color: #b1aeae;
 }
 
 .consolation {
