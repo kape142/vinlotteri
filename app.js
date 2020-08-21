@@ -45,8 +45,8 @@ const httpServer = http.createServer(app);
 expressWs(app, httpServer);
 const token = util.makeid(30);
 
-const names = ['AE', 'AF', 'AM', 'AMH', 'AMO', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV',
-    'KB', 'KIMS', 'KSM', 'LOB', 'LØB', 'LMS', 'MAJ', 'MSJ', 'NDB', 'PS', 'PW', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'VGL', 'YN'];
+const names = ['AE', 'AF', 'AM', 'AMH', 'CA', 'EAA', 'EBH', 'ES', 'GØ', 'HB', 'HE', 'HS', 'HW', 'IR', 'JMT', 'JV',
+    'KB', 'KIMS', 'KSM', 'LH', 'LOB', 'LØB', 'LMS', 'MAJ', 'MSJ', 'NDB', 'PS', 'RF', 'SBH', 'SNØ', 'TAS', 'TO', 'TES', 'VGL', 'YN'];
 
 const customTicketsPerPerson = [3, 3, 3, 3, 3, 5, 4, 4, 3, 4, 2, 4, 5, 3, 3, 5, 1, 2, 4, 4, 3, 1, 3, 4, 4, 4, 5, 5, 3, 5, 4, 3, 2, 1, 1, 1];
 
