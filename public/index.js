@@ -1,5 +1,7 @@
 let logging = false;
 
+// imgur album https://imgur.com/a/PEYw7f0
+
 function print(...a) {
     if (logging) {
         console.log(...a);
@@ -7,6 +9,7 @@ function print(...a) {
 }
 
 let drawingArea;
+let prizeImg;
 let areas;
 let startButton;
 let pauseButton;
@@ -28,6 +31,7 @@ function findTicketWidth() {
 
 window.onload = () => {
     drawingArea = document.getElementById("drawing-area");
+    prizeImg = document.getElementById("prize-img");
     areas = Array.from(document.getElementsByClassName("player-column-lane"));
     pauseButton = document.getElementById("button-pause");
     resetButton = document.getElementById("button-reset");
@@ -107,7 +111,7 @@ function update(data) {
     setTimeout(() => {
         Object.keys(data.discardedMap).filter(a => data.discardedMap[a].placing !== "none").forEach(a => {
             let ticketsToGet = data.settings.ticketsPerPerson > 0 ? data.settings.ticketsPerPerson : data.customTicketsPerPerson[data.participants.indexOf(a)];
-            print(ticketsToGet, data.discardedMap[a].placing);
+
             if (data.discardedMap[a].placing.length === ticketsToGet) {
                 document.getElementById(`${a}-name-tag`).className = "name-tag loser";
             }
@@ -162,6 +166,7 @@ function update(data) {
             data.customTicketsPerPerson.reduce((acc, cur) => acc + cur, 0);
         let order = createOrder(totalTickets);
         let index = 0;
+        prizeImg.style.display = "none";
         for (let key in data.participants) {
             let name = data.participants[key];
             let tickets = data.settings.ticketsPerPerson > 0 ? data.settings.ticketsPerPerson :
@@ -208,6 +213,11 @@ function update(data) {
                 obj.drawn = true;
             }
         }
+    }
+
+
+    if(data.winners[1]){
+        prizeImg.style.display = "";
     }
     if (!initiated && !data.info) {
         print("initiated");
