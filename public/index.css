@@ -21,7 +21,7 @@ body {
 }
 
 .name-tag {
-    height: 9.5%;
+    height: 8.5%;
     width: calc(100% - 40px);
     margin: 10px;
     border: 1px solid grey;
